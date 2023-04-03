@@ -1,0 +1,19 @@
+<style>
+    .search{
+    background-color: 	#ffffff
+    }
+    .result-card{
+    width:50%;
+    max-height:200px;
+    }
+</style>
+<div class="w-100 text-center">
+    <form autocomplete="off" id="search-form" method="post">
+        {% csrf_token %}
+        <input type="text" id="search-input" class="p-3 w-50 search">
+        <div id="result-box" class="result-card not-visible"></div>
+    </form>
+</div>
+<script>
+    console.log("hello");
+</script>

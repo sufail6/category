@@ -1,0 +1,25 @@
+{% extends 'home.html' %}
+
+{% block content %}
+  <div class="container">
+    <h2 class="text-center mb-4"><u>Add Category</u></h2><br><br>
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="text-center mb-4" class="mb-3" >
+        <label class="text-center mb-4" class="form-label">Category Name</label>
+        {{ form.category_name }}
+         {% if form.errors %}
+         <h2><p class="text-danger">Enter The Valid Data</p></h2>
+         {% endif %}
+      </div>
+      <div class="text-center">
+      <button  type="submit" class="btn btn-primary">Register</button>
+      </div>
+          <div class="col-sm-3">
+          <small id="passwordHelp" class="text-danger">
+          </small>
+      </div>
+    </form>
+  </div>
+{% endblock %}

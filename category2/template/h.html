@@ -1,0 +1,112 @@
+{% extends 'home.html' %}
+{% block content %}
+{% load static %}
+<div id="s">
+<div id="search-results">
+<style>
+    #search-results {
+  padding: 10px;
+  border: 1px solid #ccc;
+  overflow-y: scroll;
+}
+#s {
+background-color: #f9f9f9;
+}
+.my-col-span {
+        background-color: white; /* change this to the desired color */
+    }
+</style>
+<div><div><div><div>
+    <div>
+        <div>
+            <div class="card">
+                <center><a href="/sub_add" class="btn btn-primary">Add Category</a></center>
+
+            <div class="card-body">
+    <input type="text" id="search-box" placeholder="Search..." name="q">
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Sl No.</th>
+                <th>Category Name</th>
+                <th>Subcategory</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="load_data_designation_list">
+            {% for items in page.object_list %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ items.category_name }}</td>
+                 <td>{{items.subcategory}}</td>
+                <td>
+                    {% if items.is_active %}
+                        Disable
+                    {% else %}
+                        Enable
+                    {% endif %}
+                </td>
+                <td>
+                    <a class="btn btn-primary" href="{% url 'sub_update' items.id %}">EDIT</a>
+                    {% if items.is_active %}
+                        <a class="btn btn-success" href="{% url 'sub_enable' items.id %}">ENABLE</a>
+                    {% else %}
+                        <button onclick="disable({{ items.id }})" type="button" class="btn btn-danger">DISABLE</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $("#search-box").on("input", function() {
+        var query = $(this).val();
+
+        $.ajax({
+            url: "/search/",
+            method: "GET",
+            data: {"q": query},
+            success: function(data) {
+                $("#load_data_designation_list").empty();
+
+                var results = data["data"];
+                if (results.length === 0) {
+                    $("#load_data_designation_list").append("<tr><td colspan='4'>No results found.</td></tr>");
+                } else {
+                    var html = "";
+                    for (var i = 0; i < results.length; i++) {
+                        var item = results[i];
+                        html += "<tr>";
+                        html += "<td>" + (i + 1) + "</td>";
+                        html += "<td>" + item.category_name + "</td>";
+                        html += "<td>" + (item.is_active ? "Disable" : "Enable") + "</td>";
+                        html += "<td>";
+                        html += "<a class='btn btn-primary' href='/category/update/" + item.id + "'>EDIT</a>";
+                        if (item.is_active) {
+                            html += "<a class='btn btn-success' href='/category/enable/" + item.id + "'>ENABLE</a>";
+                        } else {
+                            html += "<button onclick='disable(" + item.id + ")' type='button' class='btn btn-danger'>DISABLE</button>";
+                        }
+                        html += "</td>";
+                        html += "</tr>";
+                    }
+                    $("#load_data_designation_list").html(html);
+                }
+            },
+            error: function(xhr, status, error) {
+                $("#load_data_designation_list").empty();
+                $("#load_data_designation_list").append("<tr><td colspan='4'>An error occurred while searching.</td></tr>");
+            }
+        });
+    });
+});
+</script>

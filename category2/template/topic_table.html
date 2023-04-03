@@ -1,0 +1,151 @@
+{% extends 'home.html' %}
+{% block content %}
+{% load static %}
+<div class="card">
+    <center><a href="/topic_form" class="btn btn-primary">Add Topic</a></center>
+
+    <div g="card-body">
+    <div class="col-md-3">
+        <form action="{% url 'topic_table' %}" method="get">
+        <div class="input-group">
+        <input type="text" class="form-control rounded" name="q" placeholder="Search Topic" aria-label="Search" aria-describedby="search-addon" value="{{ search_query }}">
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+        </div>
+        </form>
+    </div>
+<style>
+table, th, td {
+  border:1px solid black;
+}
+</style>
+        <table class="table" border="2">
+            <thead>
+            <th>Sl No.</th>
+            <th>Category</th>
+            <th>Subcategory</th>
+            <th>Course</th>
+            <th>Topic</th>
+            <th>Status</th>
+            <th><center>Action</center></th>
+            </thead>
+            {% for i in page.object_list %}
+            <tbody>
+            <td>{{forloop.counter}}</td>
+            <td>{{i.course.subcategory.category_name}}</td>
+            <td>{{i.course.subcategory}}</td>
+            <td>{{i.course}}</td>
+            <td>{{i.topics}}</td>
+            <td>{% if  i.is_active == True %}
+                Disable
+                {% else %}
+                Enable
+                {% endif %}</td>
+            <td><center><a class="btn btn-primary" href="{% url 'topic_update' i.id %}">Edit</a>
+                {% if  i.is_active == True %}
+                <a class="btn btn-success" href="{% url 'topic_enable' i.id %}">ENABLE</a>
+                {% else %}
+                <button onclick="disable({{i.id}})" type="button"  class="btn btn-danger">DISABLE </button></center>
+                {% endif %}
+            </td>
+            </tbody>
+            {% endfor %}
+        </table>
+<center><div class="container">
+    <div class="row my-5">
+        <div class="col-md-2 offset-md-5">
+            <p>page: {{ page.number }}/{{ page.paginator.num_pages}}</p>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item">
+                    {% if page.has_previous %}
+                    <a class="page-link" href="{% url 'topic_table' %}?page={{ page.previous_page_number}}">Previous</a>
+                    {% endif %}
+                    {% for num_page in page.paginator.page_range %}
+                    {% if page.number == num_page %}
+                    </li>
+                    <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="{% url 'topic_table' %}?page={{num_page}}">{{num_page}}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item" aria-current="page">
+                    <a class="page-link" href="{% url 'topic_table' %}?page={{num_page}}">{{num_page}}</a>
+                    </li>
+
+                    {% endif %}
+                    {% endfor %}
+
+                    <li class="page-item">
+                    {% if page.has_next%}
+                    <a class="page-link" href="{% url 'topic_table' %}?page={{page.next_page_number}}">Next</a>
+                    {% endif %}
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div></center>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% csrf_token %}
+<script type="text/javascript">
+    const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+</script>
+
+<script>
+  function disable(id) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to disable this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, disable it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        $.ajax({
+          url: '/topic_disable/'+ id,
+          type: 'PUT',
+            headers: {
+            'X-CSRFToken': csrfToken // add the CSRF token in the request headers
+          },
+          data: {userid: id},
+          success: function(data) {
+            Swal.fire(
+              'Disabled!',
+              'The category has been disabled.',
+              'success'
+            ).then(() => {
+              // Reload the page after the category has been disabled
+              location.reload();
+            });
+          },
+          error: function(xhr, status, error) {
+            Swal.fire(
+              'Error!',
+              'An error occurred while disabling the category.',
+              'error'
+            );
+          }
+        });
+      }
+    })
+  }
+</script>
+
+
+    </div><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html>
+</div>
+
+{% endblock %}
